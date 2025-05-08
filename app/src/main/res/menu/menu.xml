@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/signOut"
+        android:title="Cerrar sesión"
+        android:icon="@drawable/baseline_unavailable"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/toggleAvailability"
+        android:title="Estás no disponible"
+        android:icon="@drawable/baseline_available"
+        android:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/viewAvailableUsers"
+        android:title="Usuarios disponibles"
+        android:icon="@drawable/baseline_disponibles"
+        android:showAsAction="ifRoom" />
+
+</menu>
