@@ -193,11 +193,9 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
                             .icon(bitmapDescriptorFromVector(this@HomeActivity, R.drawable.baseline_my_location))
                     )
 
-                    if (isFirstLocationUpdate) {
-                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                            LatLng(location.latitude, location.longitude), 17f))
-                        isFirstLocationUpdate = false
-                    }
+                    val latLng = LatLng(location.latitude, location.longitude)
+                    mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng))
+
                     database.child("latitud").setValue(location.latitude)
                     database.child("longitud").setValue(location.longitude)
 
@@ -304,7 +302,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
             }
 
             R.id.viewAvailableUsers -> {
-                //startActivity(Intent(this, ListUsersActivity::class.java))
+                startActivity(Intent(this, ListUsersActivity::class.java))
                 return true
             }
         }
@@ -318,7 +316,7 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         val database = FirebaseDatabase.getInstance().getReference("users").child(userId)
         database.child("available").setValue(isAvailable)
             .addOnSuccessListener {
-                val msg = if (isAvailable) "Estás disponible" else "Estás no disponible"
+                val msg = if (isAvailable) "Estás disponible" else "No estás disponible"
                 Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
             }
             .addOnFailureListener {

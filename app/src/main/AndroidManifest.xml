@@ -24,6 +24,14 @@
             android:exported="false" />
 
         <activity
+            android:name=".ListUsersActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".TrackUserActivity"
+            android:exported="false" />
+
+        <activity
             android:name=".RegisterActivity"
             android:exported="false" />
         <activity
