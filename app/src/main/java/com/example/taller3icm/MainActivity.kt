@@ -38,6 +38,7 @@ class MainActivity : AppCompatActivity() {
             startActivity(Intent(this, RegisterActivity::class.java))
             finish()
         }
+        startService(Intent(this, UserAvailabilityService::class.java))
     }
 
     override fun onStart() {

@@ -33,6 +33,8 @@ class ListUsersActivity : AppCompatActivity() {
         binding.recyclerViewUsers.adapter = adapter
 
         loadUsersFromFirebase()
+
+        startService(Intent(this, UserAvailabilityService::class.java))
     }
 
     private fun loadUsersFromFirebase() {

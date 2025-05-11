@@ -110,6 +110,8 @@ class HomeActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        startService(Intent(this, UserAvailabilityService::class.java))
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
