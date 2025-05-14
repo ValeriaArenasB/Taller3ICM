@@ -5,11 +5,11 @@ import android.content.pm.PackageManager
 import android.graphics.Color
 import android.location.Location
 import android.os.Bundle
+import android.os.Looper
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import com.example.taller3icm.databinding.ActivityTrackUserBinding
-import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.*
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
@@ -22,6 +22,8 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityTrackUserBinding
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationRequest: LocationRequest
+    private lateinit var locationCallback: LocationCallback
     private var currentLocation: Location? = null
     private var targetMarker: Marker? = null
     private var line: Polyline? = null
@@ -45,6 +47,20 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
         mMap = googleMap
         getCurrentUserLocation()
         startListeningToUserLocation()
+
+        locationRequest = LocationRequest.Builder(
+            Priority.PRIORITY_HIGH_ACCURACY, 5000
+        ).setMinUpdateIntervalMillis(2000).build()
+
+        locationCallback = createLocationCallback()
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.requestLocationUpdates(
+                locationRequest,
+                locationCallback,
+                Looper.getMainLooper()
+            )
+        }
     }
 
     private fun getCurrentUserLocation() {
@@ -82,6 +98,19 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
         })
     }
 
+    private fun createLocationCallback(): LocationCallback {
+        return object : LocationCallback() {
+            override fun onLocationResult(result: LocationResult) {
+                super.onLocationResult(result)
+                val location = result.lastLocation ?: return
+                currentLocation = location
+                targetMarker?.position?.let {
+                    updateTargetLocation(it)
+                }
+            }
+        }
+    }
+
     private fun updateTargetLocation(latLng: LatLng) {
         if (targetMarker == null) {
             targetMarker = mMap.addMarker(
@@ -94,10 +123,8 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
         currentLocation?.let { myLoc ->
             val myLatLng = LatLng(myLoc.latitude, myLoc.longitude)
 
-            // Borrar línea anterior
             line?.remove()
 
-            // Dibujar nueva línea
             line = mMap.addPolyline(
                 PolylineOptions()
                     .add(myLatLng, latLng)
@@ -105,7 +132,6 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
                     .color(Color.BLUE)
             )
 
-            // Calcular y mostrar distancia
             val targetLoc = Location("target").apply {
                 latitude = latLng.latitude
                 longitude = latLng.longitude
@@ -114,7 +140,6 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
             val distancia = myLoc.distanceTo(targetLoc).toInt()
             binding.textViewDistance.text = "Distancia: $distancia m"
 
-            // Centrar el mapa
             val bounds = LatLngBounds.Builder()
                 .include(myLatLng)
                 .include(latLng)
@@ -122,5 +147,10 @@ class TrackUserActivity : AppCompatActivity(), OnMapReadyCallback {
 
             mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100))
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 }
