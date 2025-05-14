@@ -13,17 +13,14 @@ class UserAdapter(
 
     inner class UserViewHolder(private val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(user: MyUser) {
-            // Cargar imagen desde URL con Glide
             Glide.with(binding.root.context)
                 .load(user.imagen)
-                .placeholder(R.drawable.ic_online) // opcional: imagen temporal
-                .error(R.drawable.ic_online)       // opcional: si falla la carga
+                .placeholder(R.drawable.ic_online)
+                .error(R.drawable.ic_online)
                 .into(binding.imageViewUser)
 
-            // Mostrar nombre completo
             binding.textViewUserName.text = "${user.nombre} ${user.apellido}"
 
-            // Acción botón
             binding.buttonTrack.setOnClickListener {
                 onTrackClick(user)
             }
